@@ -1,0 +1,13 @@
+jobList: 
+  mainPage: https://www.selenium.dev/selenium/web/web-form.html
+  outdir: job_list.json
+  steps:
+    - name: teste
+      action: click
+      locator:
+        strategy: role
+        role: button
+        options:
+          name: Submit
+
+jobInfo:
