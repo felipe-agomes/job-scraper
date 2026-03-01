@@ -51,18 +51,18 @@ async function executeAction(
 ) {
   const actions = {
     click: async () => {
-      locator.click();
+      await locator.click();
     },
     fill: async () => {
       if (!value) throw new Error("value can not be null with action fill.");
 
-      locator.fill(value);
+      await locator.fill(value);
     },
     attribute: async () => {
       if (!value)
         throw new Error("value can not be null with action attribute.");
 
-      locator.getAttribute(value);
+      return await locator.getAttribute(value);
     },
   };
 
