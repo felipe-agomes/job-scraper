@@ -50,3 +50,35 @@ jobList:
       locator:
         strategy: text
         value: "{{next_page}}"
+
+jobInfo:
+  indir: job_list.json
+  outdir: job_info.json
+  steps:
+    - name: Reject cookie
+      action:
+        type: click
+      locator:
+        frame:
+          value: "#ifrmCookieBanner"
+        strategy: role
+        role: button
+        options:
+          name: Decline
+
+    - name: Open requirements
+      action:
+        type: click
+      locator:
+        strategy: role
+        role: tab
+        options:
+          name: Requerimientos
+  infos:
+    - name: Description
+      action:
+        type: inner_text
+        value: "{{description}}"
+      locator:
+        strategy: css
+        value: ".slds-tabs_scoped__content"
