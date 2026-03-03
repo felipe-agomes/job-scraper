@@ -1,0 +1,41 @@
+jobList: 
+  mainPage: https://people.talentbrand.com.br/nexti
+  outdir: job_list.json
+  steps:
+    - name: Fill job description
+      action:
+        type: fill
+        value: Desenvolvedor
+      locator:
+        strategy: placeholder
+        value: Digite o título da vaga, estado ou cidade...
+
+    - name: Submit search
+      action:
+        type: click
+      locator:
+        strategy: role
+        role: button
+        options:
+          name: Filtrar Vagas
+
+  pagination:
+    startPage: 1
+    extractStep:
+      name: Get all job link
+      action:
+        type: attribute
+        value: href
+      locator:
+        strategy: css
+        value: .link-grey
+
+    nextPageStep:
+      name: Go to next page
+      action:
+        type: click
+      locator:
+        strategy: role
+        role: link
+        options:
+          name: "{{next_page}}"
