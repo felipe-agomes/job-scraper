@@ -1,13 +1,52 @@
 jobList: 
-  mainPage: https://www.selenium.dev/selenium/web/web-form.html
+  mainPage: https://careers.emeal.nttdata.com/s/?language=pt_BR
   outdir: job_list.json
   steps:
-    - name: teste
-      action: click
+    - name: Reject cookie
+      action:
+        type: click
+      locator:
+        frame:
+          value: "#ifrmCookieBanner"
+        strategy: role
+        role: button
+        options:
+          name: Decline
+
+    - name: Fill job description
+      action:
+        type: fill
+        value: Desenvolvedor
+      locator:
+        strategy: placeholder
+        value: Encontre a oportunidade que está procurando
+
+    - name: Submit search
+      action:
+        type: click
       locator:
         strategy: role
         role: button
         options:
-          name: Submit
+          name: Pesquisar
 
-jobInfo:
+  pagination:
+    startPage: 1
+    extractStep:
+      name: Get all job link
+      action:
+        type: attribute
+        value: href
+      locator:
+        strategy: role
+        role: link
+        options:
+          name: Ver mais
+
+    nextPageStep:
+      name: Go to next page
+      action:
+        type: click
+      locator:
+        strategy: text
+        value: "{{next_page}}"

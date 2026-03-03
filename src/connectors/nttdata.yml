@@ -1,12 +1,12 @@
-job_list: 
-  main_page: https://careers.emeal.nttdata.com/s/?language=pt_BR
+jobList: 
+  mainPage: https://careers.emeal.nttdata.com/s/?language=pt_BR
   outdir: job_list.json
   steps:
     - name: Reject cookie
-      action: click
+      action:
+        type: click
       locator:
         frame:
-          strategy: css
           value: "#ifrmCookieBanner"
         strategy: role
         role: button
@@ -14,27 +14,39 @@ job_list:
           name: Decline
 
     - name: Fill job description
-      action: fill
-      value: Desenvolvedor
+      action:
+        type: fill
+        value: Desenvolvedor
       locator:
         strategy: placeholder
         value: Encontre a oportunidade que está procurando
 
     - name: Submit search
-      action: click
+      action:
+        type: click
       locator:
         strategy: role
         role: button
         options:
           name: Pesquisar
 
-    - name: Get all job link
-      action: attribute
-      value: href
+  pagination:
+    startPage: 1
+    extractStep:
+      name: Get all job link
+      action:
+        type: attribute
+        value: href
       locator:
         strategy: role
         role: link
         options:
           name: Ver mais
 
-job_info:
+    nextPageStep:
+      name: Go to next page
+      action:
+        type: click
+      locator:
+        strategy: text
+        value: "{{next_page}}"
