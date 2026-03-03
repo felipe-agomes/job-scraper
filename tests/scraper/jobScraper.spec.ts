@@ -6,5 +6,5 @@ test("Deve rodar o fluxo completo de raspagem e paginação", async () => {
   const connectors = loadConnectorConfig("src/connectors");
   const firstConnector = connectors[0]!;
 
-  await runJobScraper(firstConnector);
+  await runJobScraper(firstConnector.jobList);
 });
