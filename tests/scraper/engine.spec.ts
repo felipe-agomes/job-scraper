@@ -33,7 +33,7 @@ test("should get correct locator by strategy", ({ page }) => {
   };
 
   expect(getLocator(page, roleLocatorStrategy).toString()).toBe(
-    "getByRole('button', { name: 'Submit' })",
+    "getByRole('button', { name: 'Submit', exact: true })",
   );
   expect(getLocator(page, cssLocatorStrategy).toString()).toBe(
     "locator('#ifrmCookieBanner')",
