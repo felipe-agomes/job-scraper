@@ -52,7 +52,9 @@ async function executeAction(
 ): Promise<string[] | void> {
   switch (action.type) {
     case "click":
-      await locator.click();
+      if (await locator.isVisible()) {
+        await locator.click();
+      }
       break;
     case "fill":
       await locator.fill(action.value);
