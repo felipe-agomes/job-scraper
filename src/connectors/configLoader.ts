@@ -11,4 +11,8 @@ function loadConnectorConfig(basePath: string): Connector[] {
   );
 }
 
-export { loadConnectorConfig };
+function loadSingleConnectorConfig(path: string): Connector {
+  return parse(readFileSync(path, { encoding: "utf8" }));
+}
+
+export { loadConnectorConfig, loadSingleConnectorConfig };
