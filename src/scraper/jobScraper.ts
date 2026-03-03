@@ -1,10 +1,10 @@
 import { writeFileSync } from "fs";
 import { chromium } from "playwright";
-import type { ConnectorJobList } from "../connectors/types";
+import type { ConnectorJobInfo, ConnectorJobList } from "../connectors/types";
 import { executeSteps } from "./engine";
 import { extractAllPages } from "./pagination";
 
-async function runJobScraper(jobList: ConnectorJobList) {
+async function runJobList(jobList: ConnectorJobList) {
   const browser = await chromium.launch();
   const page = await browser.newPage();
 
