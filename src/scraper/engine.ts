@@ -61,6 +61,8 @@ async function executeAction(
       return await locator.evaluateAll((elements) =>
         elements.map((el) => el.value).filter(Boolean),
       );
+    case "inner_text":
+      return await locator.allInnerTexts();
     case "attribute":
       return await locator.evaluateAll(
         (elements, attrName) =>
