@@ -1,10 +1,11 @@
 type ConnectorActions =
   | { type: "click" }
+  | { type: "inner_text" }
   | { type: "get_value" }
   | { type: "fill"; value: string }
   | { type: "attribute"; value: string };
 
-type ConnectorRoles = "button" | "link" | "textbox";
+type ConnectorRoles = "tab" | "button" | "link" | "textbox";
 
 type ConnectorStrategies = "text" | "role" | "placeholder" | "css";
 
@@ -43,8 +44,16 @@ type ConnectorJobList = {
   pagination: ConnectorPagination;
 };
 
+type ConnectorJobInfo = {
+  indir: string;
+  outdir: string;
+  steps: ConnectorStep[];
+  infos: ConnectorStep[];
+};
+
 type Connector = {
   jobList: ConnectorJobList;
+  jobInfo: ConnectorJobInfo;
 };
 
 export type {
@@ -58,4 +67,5 @@ export type {
   ConnectorRoles,
   ConnectorActions,
   ConnectorPagination,
+  ConnectorJobInfo,
 };
