@@ -36,7 +36,10 @@ function getLocator(page: Page, locator: ConnectorLocator): Locator {
           "values role, options and name can not be null with strategy role",
         );
 
-      return base.getByRole(locator.role, { name: locator.options.name });
+      return base.getByRole(locator.role, {
+        name: locator.options.name,
+        exact: true,
+      });
     },
   };
 
