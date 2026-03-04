@@ -1,3 +1,4 @@
+id: nexti
 jobList: 
   mainPage: https://people.talentbrand.com.br/nexti
   outdir: job_list.json
@@ -5,7 +6,7 @@ jobList:
     - name: Fill job description
       action:
         type: fill
-        value: Desenvolvedor
+        value: "{{term}}"
       locator:
         strategy: placeholder
         value: Digite o título da vaga, estado ou cidade...

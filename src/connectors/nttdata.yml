@@ -1,3 +1,4 @@
+id: nttdata
 jobList: 
   mainPage: https://careers.emeal.nttdata.com/s/?language=pt_BR
   outdir: reports/job_list.json
@@ -16,7 +17,7 @@ jobList:
     - name: Fill job description
       action:
         type: fill
-        value: Desenvolvedor
+        value: "{{term}}"
       locator:
         strategy: placeholder
         value: Encontre a oportunidade que está procurando
