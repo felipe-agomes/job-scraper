@@ -20,6 +20,7 @@
   "type": "module",
   "dependencies": {
     "playwright": "^1.58.2",
+    "xlsx": "^0.18.5",
     "yaml": "^2.8.2"
   }
 }
