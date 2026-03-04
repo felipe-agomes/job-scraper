@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Mock Job Portal - Busca</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .job-card { border: 1px solid #ccc; padding: 15px; margin-top: 10px; border-radius: 5px; }
+    .pagination { margin-top: 20px; }
+    iframe { border: 1px solid red; width: 100%; height: 60px; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+
+  <iframe id="ifrmCookieBanner" srcdoc="<body style='margin:0; padding: 10px; background: #ffebeb;'><p style='display:inline;'>Aceita os cookies?</p> <button>Decline</button></body>"></iframe>
+
+  <h2>Portal de Vagas Mock</h2>
+  
+  <div>
+    <input type="text" placeholder="Encontre a oportunidade que está procurando" style="width: 300px; padding: 5px;" />
+    <button>Pesquisar</button>
+  </div>
+
+  <div id="results">
+    <div class="job-card">
+      <h3>Desenvolvedor Backend (Node.js)</h3>
+      <p>Local: Remoto</p>
+      <a href="detail.html">Ver mais</a>
+    </div>
+    <div class="job-card">
+      <h3>Desenvolvedor Frontend (React)</h3>
+      <p>Local: São Paulo, SP</p>
+      <a href="detail.html">Ver mais</a>
+    </div>
+  </div>
+
+  <div class="pagination">
+    <span>Página atual: 1</span>
+    <button>2</button>
+  </div>
+
+</body>
+</html>
