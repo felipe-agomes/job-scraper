@@ -50,8 +50,14 @@ type ConnectorJobInfo = {
 };
 
 type Connector = {
+  id: string;
   jobList: ConnectorJobList;
   jobInfo: ConnectorJobInfo;
+};
+
+type FindJob = {
+  id: string;
+  term: string;
 };
 
 export type {
@@ -66,4 +72,5 @@ export type {
   ConnectorActions,
   ConnectorPagination,
   ConnectorJobInfo,
+  FindJob,
 };
