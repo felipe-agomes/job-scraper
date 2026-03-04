@@ -1,6 +1,6 @@
 jobList: 
   mainPage: html_mocks/index.html
-  outdir: mock_job_list.json
+  outdir: tests/reports/mock_job_list.json
   steps:
     - name: Reject cookie
       action: { type: click }
@@ -41,8 +41,8 @@ jobList:
         value: "{{next_page}}"
 
 jobInfo:
-  indir: mock_job_list.json
-  outdir: mock_job_info.json
+  indir: tests/reports/mock_job_list.json
+  outdir: tests/reports/mock_job_info.json
   
   steps:
     - name: Reject cookie

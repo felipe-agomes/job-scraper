@@ -16,18 +16,22 @@ test("Deve rodar o fluxo completo de raspagem e paginação", async () => {
   await runJobList(connector.jobList);
 
   const mockDetailPath = path.resolve(__dirname, "html_mocks/detail.html");
-  const jobList = readFileSync("mock_job_list.json", {
+  const jobList = readFileSync("tests/reports/mock_job_list.json", {
     encoding: "utf8",
   }).replaceAll("detail.html", `file://${mockDetailPath}`);
 
-  writeFileSync("mock_job_list.json", jobList);
+  writeFileSync("tests/reports/mock_job_list.json", jobList);
 
   await runJobInfo(connector.jobInfo);
 
   expect(
-    JSON.parse(readFileSync("mock_job_list.json", { encoding: "utf8" })).length,
+    JSON.parse(
+      readFileSync("tests/reports/mock_job_list.json", { encoding: "utf8" }),
+    ).length,
   ).toBe(4);
   expect(
-    JSON.parse(readFileSync("mock_job_info.json", { encoding: "utf8" })).length,
+    JSON.parse(
+      readFileSync("tests/reports/mock_job_info.json", { encoding: "utf8" }),
+    ).length,
   ).toBe(4);
 });
