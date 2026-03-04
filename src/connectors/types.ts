@@ -1,9 +1,7 @@
-type ConnectorActions =
-  | { type: "click" }
-  | { type: "inner_text" }
-  | { type: "get_value" }
-  | { type: "fill"; value: string }
-  | { type: "attribute"; value: string };
+type ConnectorActions = {
+  type: "click" | "inner_text" | "get_value" | "fill" | "attribute";
+  value?: string;
+};
 
 type ConnectorRoles = "tab" | "button" | "link" | "textbox";
 
