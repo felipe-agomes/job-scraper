@@ -1,6 +1,6 @@
 jobList: 
   mainPage: https://careers.emeal.nttdata.com/s/?language=pt_BR
-  outdir: job_list.json
+  outdir: reports/job_list.json
   steps:
     - name: Reject cookie
       action:
@@ -52,8 +52,8 @@ jobList:
         value: "{{next_page}}"
 
 jobInfo:
-  indir: job_list.json
-  outdir: job_info.json
+  indir: reports/job_list.json
+  outdir: reports/job_info.json
   steps:
     - name: Reject cookie
       action:
