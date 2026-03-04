@@ -1,10 +1,12 @@
 import test from "playwright/test";
 import { loadSingleConnectorConfig } from "../../src/connectors/configLoader";
-import { runJobList } from "../../src/scraper/jobScraper";
+import { runJobInfo, runJobList } from "../../src/scraper/jobScraper";
 
 test("Deve rodar o fluxo completo de raspagem e paginação", async () => {
   const connectors = loadSingleConnectorConfig("src/connectors/nttdata.yml");
   const nextiConnector = connectors;
 
   await runJobList(nextiConnector.jobList);
+
+  await runJobInfo(nextiConnector.jobInfo);
 });
