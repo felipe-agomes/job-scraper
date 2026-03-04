@@ -39,7 +39,6 @@ test("Deve extrair os links de todas as páginas usando paginação dinâmica", 
     nextPageStep: {
       name: "Ir para próxima página",
       action: { type: "click" },
-      // A nossa lógica dinâmica onde o Orquestrador vai injetar o número
       locator: { strategy: "css", value: "#page-btn-{{next_page}}" },
     } as ConnectorStep,
   };
@@ -54,7 +53,7 @@ test("Deve extrair os links de todas as páginas usando paginação dinâmica", 
   ]);
 });
 
-test("Deve parar graciosamente se a página não tiver paginação (apenas página única)", async ({
+test("Deve parar se a página não tiver paginação (apenas página única)", async ({
   page,
 }) => {
   const mockHTML = `
