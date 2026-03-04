@@ -78,7 +78,7 @@ jobInfo:
     - name: Description
       action:
         type: inner_text
-        value: "{{description}}"
+        value: description
       locator:
         strategy: css
         value: ".slds-tabs_scoped__content"
