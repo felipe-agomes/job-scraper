@@ -1,41 +1,54 @@
+id: example
 jobList: 
   mainPage: html_mocks/index.html
   outdir: tests/reports/mock_job_list.json
   steps:
     - name: Reject cookie
-      action: { type: click }
+      action:
+        type: click
       locator:
-        frame: { strategy: css, value: "#ifrmCookieBanner" }
+        frame:
+          strategy: css
+          value: "#ifrmCookieBanner"
         strategy: role
         role: button
-        options: { name: Decline }
+        options:
+          name: Decline
 
     - name: Fill job description
-      action: { type: fill, value: Desenvolvedor }
+      action:
+        type: fill
+        value: "{{term}}"
       locator:
         strategy: placeholder
         value: Encontre a oportunidade que está procurando
 
     - name: Submit search
-      action: { type: click }
+      action:
+        type: click
       locator:
         strategy: role
         role: button
-        options: { name: Pesquisar }
+        options:
+          name: Pesquisar
 
   pagination:
     startPage: 1
     extractStep:
       name: Get all job link
-      action: { type: attribute, value: href }
+      action:
+        type: attribute
+        value: href
       locator:
         strategy: role
         role: link
-        options: { name: Ver mais }
+        options:
+          name: Ver mais
 
     nextPageStep:
       name: Go to next page
-      action: { type: click }
+      action:
+        type: click
       locator:
         strategy: text
         value: "{{next_page}}"
@@ -46,23 +59,31 @@ jobInfo:
   
   steps:
     - name: Reject cookie
-      action: { type: click }
+      action:
+        type: click
       locator:
-        frame: { strategy: css, value: "#ifrmCookieBanner" }
+        frame:
+          strategy: css
+          value: "#ifrmCookieBanner"
         strategy: role
         role: button
-        options: { name: Decline }
+        options:
+          name: Decline
 
     - name: Open requirements
-      action: { type: click }
+      action:
+        type: click
       locator:
         strategy: role
         role: tab
-        options: { name: Requerimientos }
-        
+        options:
+          name: Requerimientos
+
   infos:
     - name: description
-      action: { type: inner_text, value: description }
+      action:
+        type: inner_text
+        value: description
       locator:
         strategy: css
         value: ".slds-tabs_scoped__content"
