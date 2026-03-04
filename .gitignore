@@ -4,6 +4,7 @@ sut.spec.ts
 reports/*
 tests/reports/*
 find_job.json
+**/job_list.json
 
 # output
 out
