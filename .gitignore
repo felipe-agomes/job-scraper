@@ -3,6 +3,7 @@ node_modules
 sut.spec.ts
 reports/*
 tests/reports/*
+find_job.yml
 
 # output
 out
