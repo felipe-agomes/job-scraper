@@ -5,7 +5,7 @@ jobList:
     - name: Reject cookie
       action:
         type: click
-        timeout: 5000
+        timeout: 1000
       locator:
         frame:
           value: "#ifrmCookieBanner"
@@ -58,7 +58,7 @@ jobInfo:
     - name: Reject cookie
       action:
         type: click
-        timeout: 5000
+        timeout: 1000
       locator:
         frame:
           value: "#ifrmCookieBanner"
