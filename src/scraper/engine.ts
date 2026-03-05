@@ -51,9 +51,14 @@ async function executeAction(
   action: ConnectorActions,
 ): Promise<string[] | void> {
   switch (action.type) {
-    case "click":
-      await locator.click();
+    case "click": {
+      try {
+        if (action.timeout)
+          await locator.waitFor({ state: "visible", timeout: action.timeout });
+        await locator.click();
+      } catch {}
       break;
+    }
     case "fill":
       await locator.fill(action.value!);
       break;

@@ -1,11 +1,11 @@
 id: nttdata
 jobList: 
   mainPage: https://careers.emeal.nttdata.com/s/?language=pt_BR
-  outdir: reports/job_list.json
   steps:
     - name: Reject cookie
       action:
         type: click
+        timeout: 5000
       locator:
         frame:
           value: "#ifrmCookieBanner"
@@ -53,12 +53,12 @@ jobList:
         value: "{{next_page}}"
 
 jobInfo:
-  indir: reports/job_list.json
   outdir: reports/job_info.json
   steps:
     - name: Reject cookie
       action:
         type: click
+        timeout: 5000
       locator:
         frame:
           value: "#ifrmCookieBanner"

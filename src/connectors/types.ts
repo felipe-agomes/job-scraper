@@ -1,6 +1,7 @@
 type ConnectorActions = {
   type: "click" | "inner_text" | "get_value" | "fill" | "attribute";
   value?: string;
+  timeout?: number;
 };
 
 type ConnectorRoles = "tab" | "button" | "link" | "textbox";
@@ -37,13 +38,11 @@ type ConnectorPagination = {
 
 type ConnectorJobList = {
   mainPage: string;
-  outdir: string;
   steps: ConnectorStep[];
   pagination: ConnectorPagination;
 };
 
 type ConnectorJobInfo = {
-  indir: string;
   outdir: string;
   steps: ConnectorStep[];
   infos: ConnectorStep[];
