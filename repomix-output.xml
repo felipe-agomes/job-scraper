@@ -1,0 +1,1350 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+src/
+  connectors/
+    configLoader.ts
+    nexti.yml
+    nttdata.yml
+    types.ts
+  scraper/
+    engine.ts
+    jobScraper.ts
+    pagination.ts
+  utils/
+    replacers.ts
+  index.ts
+tests/
+  connectors/
+    configLoader.spec.ts
+    example.yml
+    nexti.spec.ts
+    nttdata.spec.ts
+  scraper/
+    html_mocks/
+      detail.html
+      index.html
+    engine.spec.ts
+    jobScraper.spec.ts
+    pagination.spec.ts
+  utils/
+    replacers.spec.ts
+.gitignore
+find_job.example.json
+package.json
+playwright.config.ts
+README.md
+tsconfig.json
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="src/scraper/pagination.ts">
+import type { Page } from "playwright";
+import type { ConnectorPagination } from "../connectors/types";
+import { executeStep, getLocator, executeAction } from "./engine";
+
+async function extractAllPages(
+  page: Page,
+  pagination: ConnectorPagination,
+): Promise<string[]> {
+  const { extractStep, startPage, nextPageStep } = pagination;
+  let currentPage = startPage;
+  const allLinks: string[] = [];
+
+  while (true) {
+    const stepResult = await executeStep(page, extractStep);
+    if (stepResult) allLinks.push(...stepResult);
+
+    currentPage++;
+    const nextStepString = JSON.stringify(nextPageStep).replaceAll(
+      "{{next_page}}",
+      `${currentPage}`,
+    );
+    const nextStep = JSON.parse(nextStepString);
+
+    const locator = getLocator(page, nextStep.locator);
+    if ((await locator.count()) === 0) break;
+
+    await executeAction(locator, nextStep.action);
+  }
+
+  return allLinks;
+}
+
+export { extractAllPages };
+</file>
+
+<file path="tests/scraper/html_mocks/detail.html">
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Mock Job Portal - Detalhes da Vaga</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .tabs { margin-top: 20px; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
+    .slds-tabs_scoped__content { border: 1px solid #ccc; padding: 20px; margin-top: 10px; background: #f9f9f9; }
+    iframe { border: 1px solid red; width: 100%; height: 60px; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+
+  <iframe id="ifrmCookieBanner" srcdoc="<body style='margin:0; padding: 10px; background: #ffebeb;'><p style='display:inline;'>Aceita os cookies?</p> <button>Decline</button></body>"></iframe>
+
+  <h1>Desenvolvedor Backend (Node.js)</h1>
+  
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true">Visão Geral</button>
+    <button role="tab" aria-selected="false">Requerimientos</button>
+  </div>
+
+  <div class="slds-tabs_scoped__content">
+    <h3>Requisitos da vaga:</h3>
+    <ul>
+      <li>Experiência sólida com TypeScript.</li>
+      <li>Conhecimento em automação com Playwright.</li>
+      <li>Padrões de projeto e Clean Code.</li>
+    </ul>
+    <p>Benefícios: Vale Alimentação, Plano de Saúde e Auxílio Home Office.</p>
+  </div>
+
+</body>
+</html>
+</file>
+
+<file path="tests/scraper/html_mocks/index.html">
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Mock Job Portal - Busca</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .job-card { border: 1px solid #ccc; padding: 15px; margin-top: 10px; border-radius: 5px; }
+    .pagination { margin-top: 20px; }
+    iframe { border: 1px solid red; width: 100%; height: 60px; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+
+  <iframe id="ifrmCookieBanner" srcdoc="<body style='margin:0; padding: 10px; background: #ffebeb;'><p style='display:inline;'>Aceita os cookies?</p> <button>Decline</button></body>"></iframe>
+
+  <h2>Portal de Vagas Mock</h2>
+  
+  <div>
+    <input type="text" placeholder="Encontre a oportunidade que está procurando" style="width: 300px; padding: 5px;" />
+    <button>Pesquisar</button>
+  </div>
+
+  <div id="results">
+    <div class="job-card">
+      <h3>Desenvolvedor Backend (Node.js)</h3>
+      <p>Local: Remoto</p>
+      <a href="detail.html">Ver mais</a>
+    </div>
+    <div class="job-card">
+      <h3>Desenvolvedor Frontend (React)</h3>
+      <p>Local: São Paulo, SP</p>
+      <a href="detail.html">Ver mais</a>
+    </div>
+  </div>
+
+  <div class="pagination">
+    <span>Página atual: 1</span>
+    <button>2</button>
+  </div>
+
+</body>
+</html>
+</file>
+
+<file path="tests/utils/replacers.spec.ts">
+import test, { expect } from "playwright/test";
+import {
+  loadFindJobConfig,
+  loadConnectorConfig,
+} from "../../src/connectors/configLoader";
+import { connectorsPlaceholderReplace } from "../../src/utils/replacers";
+
+test("should return connectors with replaced placeholders", () => {
+  const findJobs = loadFindJobConfig("tests/find_job.json");
+  const connectors = loadConnectorConfig("tests/connectors", findJobs);
+
+  const result = JSON.stringify(
+    connectorsPlaceholderReplace(connectors, findJobs),
+  );
+  expect(result.includes("{{term}}")).toBe(false);
+});
+</file>
+
+<file path="find_job.example.json">
+[{ "id": "{ID_CONNECTOR}", "term": "{TERMO_DE_PESQUISA}" }]
+</file>
+
+<file path="README.md">
+# job-scraper
+
+To install dependencies:
+
+```bash
+bun install
+```
+
+To run:
+
+```bash
+bun run index.ts
+```
+
+This project was created using `bun init` in bun v1.3.10. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+</file>
+
+<file path="tsconfig.json">
+{
+  "compilerOptions": {
+    // Environment setup & latest features
+    "lib": ["ESNext"],
+    "target": "ESNext",
+    "module": "Preserve",
+    "moduleDetection": "force",
+    "jsx": "react-jsx",
+    "allowJs": true,
+
+    // Bundler mode
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "noEmit": true,
+
+    // Best practices
+    "strict": true,
+    "skipLibCheck": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+
+    // Some stricter flags (disabled by default)
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noPropertyAccessFromIndexSignature": false
+  }
+}
+</file>
+
+<file path="src/utils/replacers.ts">
+import type { Connector, FindJob } from "../connectors/types";
+
+function connectorsPlaceholderReplace(
+  connectors: Connector[],
+  findJobs: FindJob[],
+) {
+  const connectorsReplaced: Connector[] = [];
+  for (const connector of connectors) {
+    const findJob = findJobs.find((job) => job.id === connector.id)!;
+
+    let connectorJson = JSON.stringify(connector);
+
+    for (const [key, value] of Object.entries(findJob)) {
+      if (key !== "id") {
+        connectorJson = connectorJson.replaceAll(`{{${key}}}`, value);
+      }
+    }
+
+    connectorsReplaced.push(JSON.parse(connectorJson));
+  }
+
+  return connectorsReplaced;
+}
+
+export { connectorsPlaceholderReplace };
+</file>
+
+<file path="tests/connectors/configLoader.spec.ts">
+import test, { expect } from "playwright/test";
+import {
+  loadConnectorConfig,
+  loadFindJobConfig,
+  loadSingleConnectorConfig,
+} from "../../src/connectors/configLoader";
+
+test("should bring all connectors config", () => {
+  const findJob = loadFindJobConfig("tests/find_job.json");
+  const configs = loadConnectorConfig("./tests/connectors", findJob);
+
+  expect(configs.length).toBe(1);
+});
+
+test("should bring one connector config", () => {
+  const config = loadSingleConnectorConfig("./tests/connectors/example.yml");
+
+  expect(config.id).toBe("example");
+});
+
+test("should bring one jobConfig", () => {
+  const config = loadFindJobConfig("tests/find_job.json");
+
+  expect(config.length).toBe(1);
+});
+</file>
+
+<file path="tests/scraper/pagination.spec.ts">
+import test, { expect } from "playwright/test";
+import type { ConnectorStep } from "../../src/connectors/types";
+import { extractAllPages } from "../../src/scraper/pagination";
+
+test("Deve extrair os links de todas as páginas usando paginação dinâmica", async ({
+  page,
+}) => {
+  const mockHTML = `
+      <html>
+        <body>
+          <div id="job-list">
+            <a class="vaga" href="https://site.com/vaga-1">Vaga 1</a>
+            <a class="vaga" href="https://site.com/vaga-2">Vaga 2</a>
+          </div>
+
+          <button id="page-btn-2" onclick="goToPage2()">2</button>
+
+          <script>
+            function goToPage2() {
+              // Simula o carregamento da página 2
+              document.getElementById('job-list').innerHTML = '<a class="vaga" href="https://site.com/vaga-3">Vaga 3</a>';
+              // Remove o botão para simular que acabaram as páginas
+              document.getElementById('page-btn-2').remove();
+            }
+          </script>
+        </body>
+      </html>
+    `;
+
+  await page.setContent(mockHTML);
+
+  const paginationConfig = {
+    startPage: 1,
+    extractStep: {
+      name: "Extrair links das vagas",
+      action: { type: "attribute", value: "href" },
+      locator: { strategy: "css", value: ".vaga" },
+    } as ConnectorStep,
+    nextPageStep: {
+      name: "Ir para próxima página",
+      action: { type: "click" },
+      locator: { strategy: "css", value: "#page-btn-{{next_page}}" },
+    } as ConnectorStep,
+  };
+
+  const resultLinks = await extractAllPages(page, paginationConfig);
+
+  expect(resultLinks).toHaveLength(3);
+  expect(resultLinks).toEqual([
+    "https://site.com/vaga-1",
+    "https://site.com/vaga-2",
+    "https://site.com/vaga-3",
+  ]);
+});
+
+test("Deve parar se a página não tiver paginação (apenas página única)", async ({
+  page,
+}) => {
+  const mockHTML = `
+      <html>
+        <body>
+          <a class="vaga" href="https://site.com/vaga-unica">Vaga Única</a>
+        </body>
+      </html>
+    `;
+  await page.setContent(mockHTML);
+
+  const paginationConfig = {
+    startPage: 1,
+    extractStep: {
+      name: "Extrair",
+      action: { type: "attribute", value: "href" },
+      locator: { strategy: "css", value: ".vaga" },
+    } as ConnectorStep,
+    nextPageStep: {
+      name: "Próxima",
+      action: { type: "click" },
+      locator: { strategy: "css", value: "#page-btn-{{next_page}}" },
+    } as ConnectorStep,
+  };
+
+  const resultLinks = await extractAllPages(page, paginationConfig);
+
+  expect(resultLinks).toEqual(["https://site.com/vaga-unica"]);
+});
+</file>
+
+<file path="src/connectors/configLoader.ts">
+import { readdirSync, readFileSync } from "fs";
+import { join } from "path";
+import { parse } from "yaml";
+import type { Connector, FindJob } from "./types";
+
+function loadConnectorConfig(
+  basePath: string,
+  findJobs: FindJob[],
+): Connector[] {
+  const findJobsId = findJobs.map((job) => job.id);
+
+  const configs = readdirSync(basePath).filter((conf) => conf.endsWith(".yml"));
+
+  const connectors = configs
+    .map(
+      (conf) =>
+        parse(
+          readFileSync(join(basePath, conf), { encoding: "utf8" }),
+        ) as Connector,
+    )
+    .filter((conn) => findJobsId.includes(conn.id));
+
+  return connectors;
+}
+
+function loadSingleConnectorConfig(path: string): Connector {
+  return parse(readFileSync(path, { encoding: "utf8" }));
+}
+
+function loadFindJobConfig(path: string = "find_job.json"): FindJob[] {
+  return JSON.parse(readFileSync(path, { encoding: "utf8" }));
+}
+
+export { loadConnectorConfig, loadSingleConnectorConfig, loadFindJobConfig };
+</file>
+
+<file path="src/connectors/nexti.yml">
+id: nexti
+jobList: 
+  mainPage: https://people.talentbrand.com.br/nexti
+  steps:
+    - name: Fill job description
+      action:
+        type: fill
+        value: "{{term}}"
+      locator:
+        strategy: placeholder
+        value: Digite o título da vaga, estado ou cidade...
+
+    - name: Submit search
+      action:
+        type: click
+      locator:
+        strategy: role
+        role: button
+        options:
+          name: Filtrar Vagas
+
+  pagination:
+    startPage: 1
+    extractStep:
+      name: Get all job link
+      action:
+        type: attribute
+        value: href
+      locator:
+        strategy: css
+        value: .link-grey
+
+    nextPageStep:
+      name: Go to next page
+      action:
+        type: click
+      locator:
+        strategy: role
+        role: link
+        options:
+          name: "{{next_page}}"
+</file>
+
+<file path="tests/scraper/engine.spec.ts">
+import test, { expect } from "playwright/test";
+import {
+  getLocator,
+  executeAction,
+  executeStep,
+  executeSteps,
+} from "../../src/scraper/engine";
+import type {
+  ConnectorLocator,
+  ConnectorActions,
+  ConnectorStep,
+} from "../../src/connectors/types";
+
+test.beforeEach(async ({ page }) => {
+  await page.goto("https://www.selenium.dev/selenium/web/web-form.html");
+});
+
+test("should get correct locator by strategy", ({ page }) => {
+  const roleLocatorStrategy: ConnectorLocator = {
+    strategy: "role",
+    role: "button",
+    options: {
+      name: "Submit",
+    },
+  };
+  const cssLocatorStrategy: ConnectorLocator = {
+    strategy: "css",
+    value: "#ifrmCookieBanner",
+  };
+  const placeholderLocatorStrategy: ConnectorLocator = {
+    strategy: "placeholder",
+    value: "Encontre a oportunidade que está procurando",
+  };
+
+  expect(getLocator(page, roleLocatorStrategy).toString()).toBe(
+    "getByRole('button', { name: 'Submit', exact: true })",
+  );
+  expect(getLocator(page, cssLocatorStrategy).toString()).toBe(
+    "locator('#ifrmCookieBanner')",
+  );
+  expect(getLocator(page, placeholderLocatorStrategy).toString()).toBe(
+    "getByPlaceholder('Encontre a oportunidade que está procurando')",
+  );
+});
+
+test("must correctly execute the actions of filling in the data, extracting the attribute, and clicking using the engine.", async ({
+  page,
+}) => {
+  const locatorClick = page.getByRole("button", { name: "Submit" });
+  const locatorFill = page.getByRole("textbox", { name: "Text input" });
+  const locatorGetValue = page.getByRole("textbox", { name: "Text input" });
+  const locatorAttribute = page.getByRole("textbox", {
+    name: "Readonly input",
+  });
+  const actionClick: ConnectorActions = { type: "click" };
+  const actionFill: ConnectorActions = { type: "fill", value: "Teste" };
+  const actionGetValue: ConnectorActions = { type: "get_value" };
+  const actionAttribute: ConnectorActions = {
+    type: "attribute",
+    value: "value",
+  };
+
+  await executeAction(locatorFill, actionFill);
+  await expect(locatorFill).toHaveValue("Teste");
+
+  expect(await executeAction(locatorGetValue, actionGetValue)).toEqual([
+    "Teste",
+  ]);
+
+  const attributeResult = await executeAction(
+    locatorAttribute,
+    actionAttribute,
+  );
+  expect(attributeResult).toEqual(["Readonly input"]);
+
+  await expect(locatorClick).toBeEnabled();
+  await executeAction(locatorClick, actionClick);
+  await expect(page).toHaveURL(/.*submitted-form.html/);
+});
+
+test("should execute all step", async ({ page }) => {
+  const step: ConnectorStep = {
+    name: "Teste step",
+    action: {
+      type: "click",
+    },
+    locator: {
+      strategy: "role",
+      role: "button",
+      options: {
+        name: "Submit",
+      },
+    },
+  };
+
+  await executeStep(page, step);
+  await expect(page).toHaveURL(/.*submitted-form.html/);
+});
+
+test("should execute all steps and return accumulated value", async ({
+  page,
+}) => {
+  const steps: ConnectorStep[] = [
+    {
+      name: "Test Fill",
+      action: {
+        type: "fill",
+        value: "Teste 1",
+      },
+      locator: {
+        strategy: "role",
+        role: "textbox",
+        options: {
+          name: "Text input",
+        },
+      },
+    },
+    {
+      name: "get input value",
+      action: {
+        type: "get_value",
+      },
+      locator: {
+        strategy: "role",
+        role: "textbox",
+        options: {
+          name: "Text input",
+        },
+      },
+    },
+    {
+      name: "Test Fill",
+      action: {
+        type: "fill",
+        value: "Teste 2",
+      },
+      locator: {
+        strategy: "role",
+        role: "textbox",
+        options: {
+          name: "Text input",
+        },
+      },
+    },
+    {
+      name: "get input value",
+      action: {
+        type: "get_value",
+      },
+      locator: {
+        strategy: "role",
+        role: "textbox",
+        options: {
+          name: "Text input",
+        },
+      },
+    },
+    {
+      name: "Teste step",
+      action: {
+        type: "click",
+      },
+      locator: {
+        strategy: "role",
+        role: "button",
+        options: {
+          name: "Submit",
+        },
+      },
+    },
+  ];
+
+  const result = await executeSteps(page, steps);
+  expect(result).toEqual(["Teste 1", "Teste 2"]);
+});
+</file>
+
+<file path="playwright.config.ts">
+import { defineConfig, devices } from "@playwright/test";
+
+/**
+ * Read environment variables from file.
+ * https://github.com/motdotla/dotenv
+ */
+// import dotenv from 'dotenv';
+// import path from 'path';
+// dotenv.config({ path: path.resolve(__dirname, '.env') });
+
+/**
+ * See https://playwright.dev/docs/test-configuration.
+ */
+
+const DEV_MODE = process.env.DEV === "true";
+
+export default defineConfig({
+  testDir: "./tests",
+  /* Run tests in files in parallel */
+  fullyParallel: true,
+  /* Fail the build on CI if you accidentally left test.only in the source code. */
+  forbidOnly: !!process.env.CI,
+  /* Retry on CI only */
+  retries: process.env.CI ? 2 : 0,
+  /* Opt out of parallel tests on CI. */
+  workers: process.env.CI ? 1 : undefined,
+  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
+  reporter: "html",
+  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+  use: {
+    /* Base URL to use in actions like `await page.goto('')`. */
+    // baseURL: 'http://localhost:3000',
+
+    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
+    trace: "on-first-retry",
+  },
+
+  /* Configure projects for major browsers */
+  projects: [
+    {
+      name: "chromium",
+      timeout: 1000000,
+      use: {
+        ...devices["Desktop Chrome"],
+        channel: "chromium",
+        headless: !DEV_MODE,
+        launchOptions: {
+          slowMo: DEV_MODE ? 500 : 0,
+        },
+      },
+    },
+
+    /* Test against mobile viewports. */
+    // {
+    //   name: 'Mobile Chrome',
+    //   use: { ...devices['Pixel 5'] },
+    // },
+    // {
+    //   name: 'Mobile Safari',
+    //   use: { ...devices['iPhone 12'] },
+    // },
+
+    /* Test against branded browsers. */
+    // {
+    //   name: 'Microsoft Edge',
+    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
+    // },
+    // {
+    //   name: 'Google Chrome',
+    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
+    // },
+  ],
+
+  /* Run your local dev server before starting the tests */
+  // webServer: {
+  //   command: 'npm run start',
+  //   url: 'http://localhost:3000',
+  //   reuseExistingServer: !process.env.CI,
+  // },
+});
+</file>
+
+<file path="tests/connectors/nexti.spec.ts">
+import test from "playwright/test";
+import { loadSingleConnectorConfig } from "../../src/connectors/configLoader";
+import { runJobInfo, runJobList } from "../../src/scraper/jobScraper";
+
+test.skip("Deve rodar o fluxo completo de raspagem e paginação", async ({
+  browser,
+}) => {
+  const connectors = loadSingleConnectorConfig("src/connectors/nexti.yml");
+  const nextiConnector = connectors;
+
+  const jobList = await runJobList(nextiConnector.jobList, browser);
+
+  await runJobInfo(nextiConnector.jobInfo, browser, jobList);
+});
+</file>
+
+<file path="package.json">
+{
+  "name": "job-scraper",
+  "module": "src/index.ts",
+  "scripts": {
+    "scrape": "bun run src/index.ts",
+    "scrape:dev": "DEV=true bun run src/index.ts",
+    "test": "bunx playwright test",
+    "test:dev": "DEV=true bunx playwright test",
+    "test:headed": "bunx playwright test --headed",
+    "test:ui": "bunx playwright test --ui",
+    "test:debug": "bunx playwright test --debug"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@types/bun": "^1.3.9",
+    "@types/node": "^25.3.3"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "playwright": "^1.58.2",
+    "xlsx": "^0.18.5",
+    "yaml": "^2.8.2"
+  }
+}
+</file>
+
+<file path="src/connectors/types.ts">
+type ConnectorActions = {
+  type: "click" | "inner_text" | "get_value" | "fill" | "attribute";
+  value?: string;
+  timeout?: number;
+};
+
+type ConnectorRoles = "tab" | "button" | "link" | "textbox";
+
+type ConnectorStrategies = "text" | "role" | "placeholder" | "css";
+
+type ConnectorLocatorOptions = {
+  name: string;
+};
+
+type ConnectorFrame = {
+  value: string;
+};
+
+type ConnectorLocator = {
+  strategy: ConnectorStrategies;
+  frame?: ConnectorFrame;
+  value?: string;
+  role?: ConnectorRoles;
+  options?: ConnectorLocatorOptions;
+};
+
+type ConnectorStep = {
+  name: string;
+  action: ConnectorActions;
+  locator: ConnectorLocator;
+};
+
+type ConnectorPagination = {
+  startPage: number;
+  extractStep: ConnectorStep;
+  nextPageStep: ConnectorStep;
+};
+
+type ConnectorJobList = {
+  mainPage: string;
+  steps: ConnectorStep[];
+  pagination: ConnectorPagination;
+};
+
+type ConnectorJobInfo = {
+  outdir: string;
+  steps: ConnectorStep[];
+  infos: ConnectorStep[];
+};
+
+type Connector = {
+  id: string;
+  jobList: ConnectorJobList;
+  jobInfo: ConnectorJobInfo;
+};
+
+type FindJob = {
+  id: string;
+  term: string;
+};
+
+export type {
+  Connector,
+  ConnectorJobList,
+  ConnectorStep,
+  ConnectorLocator,
+  ConnectorFrame,
+  ConnectorLocatorOptions,
+  ConnectorStrategies,
+  ConnectorRoles,
+  ConnectorActions,
+  ConnectorPagination,
+  ConnectorJobInfo,
+  FindJob,
+};
+</file>
+
+<file path="src/scraper/jobScraper.ts">
+import type { Browser } from "playwright";
+import type { ConnectorJobInfo, ConnectorJobList } from "../connectors/types";
+import { executeStep, executeSteps } from "./engine";
+import { extractAllPages } from "./pagination";
+import { writeFileSync } from "node:fs";
+
+async function runJobList(
+  jobList: ConnectorJobList,
+  browser: Browser,
+): Promise<string[]> {
+  const page = await browser.newPage();
+
+  try {
+    await page.goto(jobList.mainPage);
+    await executeSteps(page, jobList.steps);
+
+    const links = await extractAllPages(page, jobList.pagination);
+
+    return links;
+  } finally {
+    await page.close();
+  }
+}
+
+async function runJobInfo(
+  jobInfo: ConnectorJobInfo,
+  browser: Browser,
+  links: string[],
+): Promise<void> {
+  const page = await browser.newPage();
+  const result: Record<string, string>[] = [];
+
+  try {
+    for (const link of links) {
+      await page.goto(link);
+      await executeSteps(page, jobInfo.steps);
+
+      for (const info of jobInfo.infos) {
+        const stepResult = await executeStep(page, info);
+
+        if (stepResult)
+          result.push({ [info.action?.value ?? ""]: stepResult.join() });
+      }
+    }
+
+    writeFileSync(jobInfo.outdir, JSON.stringify(result, null, 2));
+  } finally {
+    await page.close();
+  }
+}
+
+export { runJobList, runJobInfo };
+</file>
+
+<file path="src/index.ts">
+import { chromium } from "playwright";
+import {
+  loadFindJobConfig,
+  loadConnectorConfig,
+} from "./connectors/configLoader";
+import { runJobList, runJobInfo } from "./scraper/jobScraper";
+import { connectorsPlaceholderReplace } from "./utils/replacers";
+
+const DEV_MODE = process.env.DEV === "true";
+(async () => {
+  const findJob = loadFindJobConfig("find_job.json");
+  const connectors = loadConnectorConfig("src/connectors", findJob);
+  const replaced = connectorsPlaceholderReplace(connectors, findJob);
+
+  const browser = await chromium.launch({
+    headless: !DEV_MODE,
+    slowMo: DEV_MODE ? 500 : 0,
+  });
+
+  try {
+    for (const connector of replaced) {
+      const links = await runJobList(connector.jobList, browser);
+      await runJobInfo(connector.jobInfo, browser, links);
+    }
+  } finally {
+    await browser.close();
+  }
+})();
+</file>
+
+<file path=".gitignore">
+# dependencies (bun install)
+node_modules
+sut.spec.ts
+reports/*
+tests/reports/*
+find_job.json
+**/job_list.json
+
+# output
+out
+dist
+*.tgz
+
+# code coverage
+coverage
+*.lcov
+
+# logs
+logs
+_.log
+report.[0-9]_.[0-9]_.[0-9]_.[0-9]_.json
+
+# dotenv environment variable files
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# caches
+.eslintcache
+.cache
+*.tsbuildinfo
+
+# IntelliJ based IDEs
+.idea
+
+# Finder (MacOS) folder config
+.DS_Store
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+</file>
+
+<file path="src/scraper/engine.ts">
+import type { Page, Locator, FrameLocator } from "playwright";
+import type {
+  ConnectorLocator,
+  ConnectorStrategies,
+  ConnectorActions,
+  ConnectorStep,
+} from "../connectors/types";
+
+function getLocator(page: Page, locator: ConnectorLocator): Locator {
+  const base: Page | FrameLocator = locator.frame
+    ? page.frameLocator(locator.frame.value)
+    : page;
+
+  const strategyMap: Record<ConnectorStrategies, () => Locator> = {
+    css: () => {
+      if (!locator.value)
+        throw new Error("value can not be null with strategy css");
+
+      return base.locator(locator.value);
+    },
+    placeholder: () => {
+      if (!locator.value)
+        throw new Error("value can not be null with strategy placeholder");
+
+      return base.getByPlaceholder(locator.value);
+    },
+    text: () => {
+      if (!locator.value)
+        throw new Error("value can not be null with strategy text");
+
+      return base.getByText(locator.value, { exact: true });
+    },
+    role: () => {
+      if (!locator.role || !locator.options || !locator.options.name)
+        throw new Error(
+          "values role, options and name can not be null with strategy role",
+        );
+
+      return base.getByRole(locator.role, {
+        name: locator.options.name,
+        exact: true,
+      });
+    },
+  };
+
+  return strategyMap[locator.strategy]();
+}
+
+async function executeAction(
+  locator: Locator,
+  action: ConnectorActions,
+): Promise<string[] | void> {
+  switch (action.type) {
+    case "click": {
+      try {
+        if (action.timeout)
+          await locator.waitFor({ state: "visible", timeout: action.timeout });
+        await locator.click();
+      } catch {}
+      break;
+    }
+    case "fill":
+      await locator.fill(action.value!);
+      break;
+    case "get_value":
+      return await locator.evaluateAll((elements) =>
+        elements.map((el) => el.value).filter(Boolean),
+      );
+    case "inner_text":
+      return await locator.allInnerTexts();
+    case "attribute":
+      return await locator.evaluateAll(
+        (elements, attrName) =>
+          elements.map((el) => el.getAttribute(attrName)).filter(Boolean),
+        action.value,
+      );
+  }
+}
+
+async function executeStep(page: Page, step: ConnectorStep) {
+  const locator = getLocator(page, step.locator);
+
+  return await executeAction(locator, step.action);
+}
+
+async function executeSteps(page: Page, steps: ConnectorStep[]) {
+  const resultSteps: string[] = [];
+
+  for (const step of steps) {
+    const resultStep = await executeStep(page, step);
+
+    if (resultStep) resultSteps.push(...resultStep);
+  }
+
+  return resultSteps;
+}
+
+export { getLocator, executeAction, executeStep, executeSteps };
+</file>
+
+<file path="tests/connectors/example.yml">
+id: example
+jobList: 
+  mainPage: html_mocks/index.html
+  steps:
+    - name: Reject cookie
+      action:
+        type: click
+      locator:
+        frame:
+          strategy: css
+          value: "#ifrmCookieBanner"
+        strategy: role
+        role: button
+        options:
+          name: Decline
+
+    - name: Fill job description
+      action:
+        type: fill
+        value: "{{term}}"
+      locator:
+        strategy: placeholder
+        value: Encontre a oportunidade que está procurando
+
+    - name: Submit search
+      action:
+        type: click
+      locator:
+        strategy: role
+        role: button
+        options:
+          name: Pesquisar
+
+  pagination:
+    startPage: 1
+    extractStep:
+      name: Get all job link
+      action:
+        type: attribute
+        value: href
+      locator:
+        strategy: role
+        role: link
+        options:
+          name: Ver mais
+
+    nextPageStep:
+      name: Go to next page
+      action:
+        type: click
+      locator:
+        strategy: text
+        value: "{{next_page}}"
+
+jobInfo:
+  outdir: tests/reports/mock_job_info.json
+  
+  steps:
+    - name: Reject cookie
+      action:
+        type: click
+      locator:
+        frame:
+          strategy: css
+          value: "#ifrmCookieBanner"
+        strategy: role
+        role: button
+        options:
+          name: Decline
+
+    - name: Open requirements
+      action:
+        type: click
+      locator:
+        strategy: role
+        role: tab
+        options:
+          name: Requerimientos
+
+  infos:
+    - name: description
+      action:
+        type: inner_text
+        value: description
+      locator:
+        strategy: css
+        value: ".slds-tabs_scoped__content"
+</file>
+
+<file path="tests/connectors/nttdata.spec.ts">
+import test from "playwright/test";
+import { loadSingleConnectorConfig } from "../../src/connectors/configLoader";
+import { runJobInfo, runJobList } from "../../src/scraper/jobScraper";
+
+test("Deve rodar o fluxo completo de raspagem e paginação", async ({
+  browser,
+}) => {
+  const connectors = loadSingleConnectorConfig("src/connectors/nttdata.yml");
+  const nextiConnector = connectors;
+
+  const jobList = await runJobList(nextiConnector.jobList, browser);
+
+  await runJobInfo(nextiConnector.jobInfo, browser, jobList);
+});
+</file>
+
+<file path="tests/scraper/jobScraper.spec.ts">
+import test, { expect } from "playwright/test";
+import { loadSingleConnectorConfig } from "../../src/connectors/configLoader";
+import { runJobInfo, runJobList } from "../../src/scraper/jobScraper";
+import path from "path";
+import { fileURLToPath } from "url";
+import { readFileSync } from "fs";
+
+test("Deve rodar o fluxo completo de raspagem e paginação", async ({
+  browser,
+}) => {
+  const connector = loadSingleConnectorConfig("tests/connectors/example.yml");
+
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+  const mockHtmlPath = path.resolve(__dirname, connector.jobList.mainPage);
+  connector.jobList.mainPage = `file://${mockHtmlPath}`;
+
+  const jobList = (await runJobList(connector.jobList, browser)).map(
+    () => `file://${path.resolve(__dirname, "html_mocks/detail.html")}`,
+  );
+
+  await runJobInfo(connector.jobInfo, browser, jobList);
+
+  expect(
+    JSON.parse(
+      readFileSync("tests/reports/mock_job_info.json", { encoding: "utf8" }),
+    ).length,
+  ).toBe(4);
+});
+</file>
+
+<file path="src/connectors/nttdata.yml">
+id: nttdata
+jobList: 
+  mainPage: https://careers.emeal.nttdata.com/s/?language=pt_BR
+  steps:
+    - name: Reject cookie
+      action:
+        type: click
+        timeout: 1000
+      locator:
+        frame:
+          value: "#ifrmCookieBanner"
+        strategy: role
+        role: button
+        options:
+          name: Decline
+
+    - name: Fill job description
+      action:
+        type: fill
+        value: "{{term}}"
+      locator:
+        strategy: placeholder
+        value: Encontre a oportunidade que está procurando
+
+    - name: Submit search
+      action:
+        type: click
+      locator:
+        strategy: role
+        role: button
+        options:
+          name: Pesquisar
+
+  pagination:
+    startPage: 1
+    extractStep:
+      name: Get all job link
+      action:
+        type: attribute
+        value: href
+      locator:
+        strategy: role
+        role: link
+        options:
+          name: Ver mais
+
+    nextPageStep:
+      name: Go to next page
+      action:
+        type: click
+      locator:
+        strategy: text
+        value: "{{next_page}}"
+
+jobInfo:
+  outdir: reports/job_info.json
+  steps:
+    - name: Reject cookie
+      action:
+        type: click
+        timeout: 1000
+      locator:
+        frame:
+          value: "#ifrmCookieBanner"
+        strategy: role
+        role: button
+        options:
+          name: Decline
+
+    - name: Open requirements
+      action:
+        type: click
+      locator:
+        strategy: role
+        role: tab
+        options:
+          name: Requerimientos
+  infos:
+    - name: Description
+      action:
+        type: inner_text
+        value: description
+      locator:
+        strategy: css
+        value: ".slds-tabs_scoped__content"
+</file>
+
+</files>

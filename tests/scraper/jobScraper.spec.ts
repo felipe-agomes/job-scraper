@@ -3,7 +3,7 @@ import { loadSingleConnectorConfig } from "../../src/connectors/configLoader";
 import { runJobInfo, runJobList } from "../../src/scraper/jobScraper";
 import path from "path";
 import { fileURLToPath } from "url";
-import { readFileSync } from "fs";
+import { readFileSync } from "node:fs";
 
 test("Deve rodar o fluxo completo de raspagem e paginação", async ({
   browser,
