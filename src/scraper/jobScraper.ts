@@ -11,10 +11,14 @@ async function runJobList(
   const page = await browser.newPage();
 
   try {
+    console.log(`  → Navigating to ${jobList.mainPage}`);
+
     await page.goto(jobList.mainPage);
     await executeSteps(page, jobList.steps);
 
     const links = await extractAllPages(page, jobList.pagination);
+
+    console.log(`  → Found ${links.length} job listings`);
 
     return links;
   } finally {
@@ -31,19 +35,23 @@ async function runJobInfo(
   const result: Record<string, string>[] = [];
 
   try {
-    for (const link of links) {
+    for (const [index, link] of links.entries()) {
+      process.stdout.write(`  → Scraping job ${index + 1}/${links.length}\r`);
+
       await page.goto(link);
       await executeSteps(page, jobInfo.steps);
 
       for (const info of jobInfo.infos) {
         const stepResult = await executeStep(page, info);
-
         if (stepResult)
           result.push({ [info.action?.value ?? ""]: stepResult.join() });
       }
     }
 
+    process.stdout.write("\n");
     writeFileSync(jobInfo.outdir, JSON.stringify(result, null, 2));
+
+    console.log(`  → Saved to ${jobInfo.outdir}`);
   } finally {
     await page.close();
   }

@@ -12,6 +12,10 @@ const DEV_MODE = process.env.DEV === "true";
   const connectors = loadConnectorConfig("src/connectors", findJob);
   const replaced = connectorsPlaceholderReplace(connectors, findJob);
 
+  console.log(
+    `Starting scraper for ${replaced.length} connector(s)${DEV_MODE ? " [DEV]" : ""}`,
+  );
+
   const browser = await chromium.launch({
     headless: !DEV_MODE,
     slowMo: DEV_MODE ? 500 : 0,
@@ -19,9 +23,13 @@ const DEV_MODE = process.env.DEV === "true";
 
   try {
     for (const connector of replaced) {
+      console.log(`\n[${connector.id}]`);
+
       const links = await runJobList(connector.jobList, browser);
       await runJobInfo(connector.jobInfo, browser, links);
     }
+
+    console.log("\nDone.");
   } finally {
     await browser.close();
   }
