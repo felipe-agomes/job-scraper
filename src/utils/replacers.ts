@@ -7,15 +7,16 @@ function connectorsPlaceholderReplace(
   const connectorsReplaced: Connector[] = [];
   for (const connector of connectors) {
     const findJob = findJobs.find((job) => job.id === connector.id)!;
-    const connectorJson = JSON.stringify(connector);
+
+    let connectorJson = JSON.stringify(connector);
 
     for (const [key, value] of Object.entries(findJob)) {
       if (key !== "id") {
-        connectorsReplaced.push(
-          JSON.parse(connectorJson.replaceAll(`{{${key}}}`, value)),
-        );
+        connectorJson = connectorJson.replaceAll(`{{${key}}}`, value);
       }
     }
+
+    connectorsReplaced.push(JSON.parse(connectorJson));
   }
 
   return connectorsReplaced;
