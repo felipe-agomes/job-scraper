@@ -11,6 +11,9 @@ import { defineConfig, devices } from "@playwright/test";
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
+
+const DEV_MODE = process.env.DEV === "true";
+
 export default defineConfig({
   testDir: "./tests",
   /* Run tests in files in parallel */
@@ -40,7 +43,10 @@ export default defineConfig({
       use: {
         ...devices["Desktop Chrome"],
         channel: "chromium",
-        // headless: false,
+        headless: !DEV_MODE,
+        launchOptions: {
+          slowMo: DEV_MODE ? 500 : 0,
+        },
       },
     },
 

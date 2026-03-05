@@ -5,6 +5,7 @@
     "scrape": "bun run src/index.ts",
     "scrape:dev": "DEV=true bun run src/index.ts",
     "test": "bunx playwright test",
+    "test:dev": "DEV=true bunx playwright test",
     "test:headed": "bunx playwright test --headed",
     "test:ui": "bunx playwright test --ui",
     "test:debug": "bunx playwright test --debug"
