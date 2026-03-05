@@ -1,11 +1,13 @@
-import { chromium } from "playwright";
+import type { Browser } from "playwright";
 import type { ConnectorJobInfo, ConnectorJobList } from "../connectors/types";
 import { executeStep, executeSteps } from "./engine";
 import { extractAllPages } from "./pagination";
-import { readFileSync, writeFileSync } from "node:fs";
+import { writeFileSync } from "node:fs";
 
-async function runJobList(jobList: ConnectorJobList) {
-  const browser = await chromium.launch();
+async function runJobList(
+  jobList: ConnectorJobList,
+  browser: Browser,
+): Promise<string[]> {
   const page = await browser.newPage();
 
   try {
@@ -14,32 +16,37 @@ async function runJobList(jobList: ConnectorJobList) {
 
     const links = await extractAllPages(page, jobList.pagination);
 
-    writeFileSync(jobList.outdir, JSON.stringify(links, null, 2));
+    return links;
   } finally {
-    await browser.close();
+    await page.close();
   }
 }
 
-async function runJobInfo(jobInfo: ConnectorJobInfo) {
-  const browser = await chromium.launch();
+async function runJobInfo(
+  jobInfo: ConnectorJobInfo,
+  browser: Browser,
+  links: string[],
+): Promise<void> {
   const page = await browser.newPage();
-
-  const links = JSON.parse(readFileSync(jobInfo.indir, { encoding: "utf8" }));
   const result: Record<string, string>[] = [];
-  for (const link of links) {
-    await page.goto(link);
 
-    await executeSteps(page, jobInfo.steps);
+  try {
+    for (const link of links) {
+      await page.goto(link);
+      await executeSteps(page, jobInfo.steps);
 
-    for (const info of jobInfo.infos) {
-      const stepResult = await executeStep(page, info);
+      for (const info of jobInfo.infos) {
+        const stepResult = await executeStep(page, info);
 
-      if (stepResult)
-        result.push({ [info.action?.value ?? ""]: stepResult.join() });
+        if (stepResult)
+          result.push({ [info.action?.value ?? ""]: stepResult.join() });
+      }
     }
-  }
 
-  writeFileSync(jobInfo.outdir, JSON.stringify(result, null, 2));
+    writeFileSync(jobInfo.outdir, JSON.stringify(result, null, 2));
+  } finally {
+    await page.close();
+  }
 }
 
 export { runJobList, runJobInfo };

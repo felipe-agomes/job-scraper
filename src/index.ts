@@ -1,3 +1,4 @@
+import { chromium } from "playwright";
 import {
   loadFindJobConfig,
   loadConnectorConfig,
@@ -8,11 +9,16 @@ import { connectorsPlaceholderReplace } from "./utils/replacers";
 (async () => {
   const findJob = loadFindJobConfig("find_job.json");
   const connectors = loadConnectorConfig("src/connectors", findJob);
-
   const replaced = connectorsPlaceholderReplace(connectors, findJob);
 
-  for (const connector of replaced) {
-    await runJobList(connector.jobList);
-    await runJobInfo(connector.jobInfo);
+  const browser = await chromium.launch({ headless: false });
+
+  try {
+    for (const connector of replaced) {
+      const links = await runJobList(connector.jobList, browser);
+      await runJobInfo(connector.jobInfo, browser, links);
+    }
+  } finally {
+    await browser.close();
   }
 })();

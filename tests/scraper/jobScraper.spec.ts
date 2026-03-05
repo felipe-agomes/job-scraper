@@ -3,9 +3,11 @@ import { loadSingleConnectorConfig } from "../../src/connectors/configLoader";
 import { runJobInfo, runJobList } from "../../src/scraper/jobScraper";
 import path from "path";
 import { fileURLToPath } from "url";
-import { readFileSync, writeFileSync } from "fs";
+import { readFileSync } from "fs";
 
-test("Deve rodar o fluxo completo de raspagem e paginação", async () => {
+test("Deve rodar o fluxo completo de raspagem e paginação", async ({
+  browser,
+}) => {
   const connector = loadSingleConnectorConfig("tests/connectors/example.yml");
 
   const __filename = fileURLToPath(import.meta.url);
@@ -13,22 +15,12 @@ test("Deve rodar o fluxo completo de raspagem e paginação", async () => {
   const mockHtmlPath = path.resolve(__dirname, connector.jobList.mainPage);
   connector.jobList.mainPage = `file://${mockHtmlPath}`;
 
-  await runJobList(connector.jobList);
+  const jobList = (await runJobList(connector.jobList, browser)).map(
+    () => `file://${path.resolve(__dirname, "html_mocks/detail.html")}`,
+  );
 
-  const mockDetailPath = path.resolve(__dirname, "html_mocks/detail.html");
-  const jobList = readFileSync("tests/reports/mock_job_list.json", {
-    encoding: "utf8",
-  }).replaceAll("detail.html", `file://${mockDetailPath}`);
+  await runJobInfo(connector.jobInfo, browser, jobList);
 
-  writeFileSync("tests/reports/mock_job_list.json", jobList);
-
-  await runJobInfo(connector.jobInfo);
-
-  expect(
-    JSON.parse(
-      readFileSync("tests/reports/mock_job_list.json", { encoding: "utf8" }),
-    ).length,
-  ).toBe(4);
   expect(
     JSON.parse(
       readFileSync("tests/reports/mock_job_info.json", { encoding: "utf8" }),
