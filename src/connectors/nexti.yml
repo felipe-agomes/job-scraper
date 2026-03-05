@@ -1,7 +1,6 @@
 id: nexti
 jobList: 
   mainPage: https://people.talentbrand.com.br/nexti
-  outdir: job_list.json
   steps:
     - name: Fill job description
       action:

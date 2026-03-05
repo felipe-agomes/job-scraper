@@ -1,7 +1,6 @@
 id: example
 jobList: 
   mainPage: html_mocks/index.html
-  outdir: tests/reports/mock_job_list.json
   steps:
     - name: Reject cookie
       action:
@@ -54,7 +53,6 @@ jobList:
         value: "{{next_page}}"
 
 jobInfo:
-  indir: tests/reports/mock_job_list.json
   outdir: tests/reports/mock_job_info.json
   
   steps:
