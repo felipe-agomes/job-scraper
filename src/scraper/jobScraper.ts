@@ -45,11 +45,12 @@ async function runJobInfo(
       await page.goto(link);
       await executeSteps(page, jobInfo.steps);
 
+      const jobData: Record<string, string> = {};
       for (const info of jobInfo.infos) {
         const stepResult = await executeStep(page, info);
-        if (stepResult)
-          result.data.push({ [info.action?.value ?? ""]: stepResult.join() });
+        if (stepResult) jobData[info.name] = stepResult.join();
       }
+      result.data.push(jobData);
     }
     process.stdout.write("\n");
 
