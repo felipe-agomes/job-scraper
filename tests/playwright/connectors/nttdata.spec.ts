@@ -5,10 +5,9 @@ import { runJobInfo, runJobList } from "../../../src/scraper/jobScraper";
 test("Deve rodar o fluxo completo de raspagem e paginação", async ({
   browser,
 }) => {
-  const connectors = loadSingleConnectorConfig("src/connectors/nttdata.yml");
-  const nextiConnector = connectors;
+  const connector = loadSingleConnectorConfig("src/connectors/nttdata.yml");
 
-  const jobList = await runJobList(nextiConnector.jobList, browser);
+  const jobList = await runJobList(connector.jobList, browser);
 
-  await runJobInfo(nextiConnector.jobInfo, browser, jobList);
+  const jobDetail = await runJobInfo(connector.id, connector.jobInfo, browser, jobList);
 });
