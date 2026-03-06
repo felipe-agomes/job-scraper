@@ -53,7 +53,7 @@ jobList:
         value: "{{next_page}}"
 
 jobInfo:
-  outdir: tests/reports/mock_job_info.json
+  outdir: tests/playwright/reports/mock_job_info.json
   
   steps:
     - name: Reject cookie

@@ -1,6 +1,6 @@
-import test, { expect } from "playwright/test";
-import type { ConnectorStep } from "../../src/connectors/types";
-import { extractAllPages } from "../../src/scraper/pagination";
+import { test, expect } from "@playwright/test";
+import type { ConnectorStep } from "../../../src/connectors/types";
+import { extractAllPages } from "../../../src/scraper/pagination";
 
 test("Deve extrair os links de todas as páginas usando paginação dinâmica", async ({
   page,
