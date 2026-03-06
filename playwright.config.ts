@@ -15,7 +15,8 @@ import { defineConfig, devices } from "@playwright/test";
 const DEV_MODE = process.env.DEV === "true";
 
 export default defineConfig({
-  testDir: "./tests",
+  testMatch: "**/*.spec.ts", // Playwright só pega .spec.ts
+  testDir: "./tests/playwright",
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
