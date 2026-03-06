@@ -1,8 +1,11 @@
 import type { Browser } from "playwright";
-import type { ConnectorJobInfo, ConnectorJobList } from "../connectors/types";
+import type {
+  ConnectorJobInfo,
+  ConnectorJobList,
+  JobDetail,
+} from "../connectors/types";
 import { executeStep, executeSteps } from "./engine";
 import { extractAllPages } from "./pagination";
-import { writeFileSync } from "node:fs";
 
 async function runJobList(
   jobList: ConnectorJobList,
@@ -27,12 +30,13 @@ async function runJobList(
 }
 
 async function runJobInfo(
+  connectorId: string,
   jobInfo: ConnectorJobInfo,
   browser: Browser,
   links: string[],
-): Promise<void> {
+): Promise<JobDetail> {
   const page = await browser.newPage();
-  const result: Record<string, string>[] = [];
+  const result: JobDetail = { id: connectorId, data: [] };
 
   try {
     for (const [index, link] of links.entries()) {
@@ -44,14 +48,12 @@ async function runJobInfo(
       for (const info of jobInfo.infos) {
         const stepResult = await executeStep(page, info);
         if (stepResult)
-          result.push({ [info.action?.value ?? ""]: stepResult.join() });
+          result.data.push({ [info.action?.value ?? ""]: stepResult.join() });
       }
     }
-
     process.stdout.write("\n");
-    writeFileSync(jobInfo.outdir, JSON.stringify(result, null, 2));
 
-    console.log(`  → Saved to ${jobInfo.outdir}`);
+    return result;
   } finally {
     await page.close();
   }

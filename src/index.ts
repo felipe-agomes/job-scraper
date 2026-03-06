@@ -5,6 +5,8 @@ import {
 } from "./connectors/configLoader";
 import { runJobList, runJobInfo } from "./scraper/jobScraper";
 import { connectorsPlaceholderReplace } from "./utils/replacers";
+import * as report from "./utils/report";
+import { writeFile } from "xlsx";
 
 const DEV_MODE = process.env.DEV === "true";
 (async () => {
@@ -22,12 +24,28 @@ const DEV_MODE = process.env.DEV === "true";
   });
 
   try {
+    const sheets: report.NewSheet[] = [];
     for (const connector of replaced) {
       console.log(`\n[${connector.id}]`);
 
       const links = await runJobList(connector.jobList, browser);
-      await runJobInfo(connector.jobInfo, browser, links);
+      const jobDetail = await runJobInfo(
+        connector.id,
+        connector.jobInfo,
+        browser,
+        links,
+      );
+
+      sheets.push({
+        name: connector.id,
+        data: jobDetail.data,
+      });
+
+      console.log(`  → Complete connector ${connector.id}`);
     }
+
+    writeFile(report.createWorkBook(sheets), "reports.xlsx");
+    console.log(`Saved to reports.xlsx`);
 
     console.log("\nDone.");
   } finally {
