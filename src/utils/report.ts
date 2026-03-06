@@ -7,7 +7,7 @@ import xlsx, {
 
 type NewSheet = {
   name: string;
-  data: any[];
+  data: Record<string, unknown>[];
 };
 
 function autoFitColumns(data: Record<string, unknown>[]): ColInfo[] {

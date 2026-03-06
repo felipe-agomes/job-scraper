@@ -53,15 +53,12 @@ jobList:
         value: "{{next_page}}"
 
 jobInfo:
-  outdir: tests/playwright/reports/mock_job_info.json
-  
   steps:
     - name: Reject cookie
       action:
         type: click
       locator:
         frame:
-          strategy: css
           value: "#ifrmCookieBanner"
         strategy: role
         role: button

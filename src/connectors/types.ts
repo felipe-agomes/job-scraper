@@ -43,7 +43,6 @@ type ConnectorJobList = {
 };
 
 type ConnectorJobInfo = {
-  outdir: string;
   steps: ConnectorStep[];
   infos: ConnectorStep[];
 };
