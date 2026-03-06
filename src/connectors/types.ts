@@ -54,6 +54,11 @@ type Connector = {
   jobInfo: ConnectorJobInfo;
 };
 
+type JobDetail = {
+  id: string;
+  data: Record<string, string>[];
+};
+
 type FindJob = {
   id: string;
   term: string;
@@ -71,5 +76,6 @@ export type {
   ConnectorActions,
   ConnectorPagination,
   ConnectorJobInfo,
+  JobDetail,
   FindJob,
 };
