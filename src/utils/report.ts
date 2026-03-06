@@ -42,7 +42,7 @@ function autoFitRows(data: Record<string, unknown>[]): RowInfo[] {
   ];
 }
 
-function createJsonSheet(data: any[]): WorkSheet {
+function createJsonSheet(data: Record<string, unknown>[]): WorkSheet {
   const sheet = xlsx.utils.json_to_sheet(data);
 
   sheet["!cols"] = autoFitColumns(data);
